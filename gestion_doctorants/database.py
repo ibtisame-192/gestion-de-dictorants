@@ -1,4 +1,4 @@
-# gestion_doctorants/database.py - FIXED VERSION
+# gestion_doctorants/database.py 
 import sqlite3
 import os
 import json
@@ -35,7 +35,7 @@ class Database:
             if os.path.exists(lock_file):
                 try:
                     os.remove(lock_file)
-                    print(f"🧹 Removed lock file: {lock_file}")
+                    print(f"Removed lock file: {lock_file}")
                 except:
                     pass
     
@@ -93,7 +93,7 @@ class Database:
             self.insert_default_data(cursor)
             
             conn.commit()
-            print(f"✅ Database initialized successfully at: {self.db_path}")
+            print(f"Database initialized successfully at: {self.db_path}")
             
         except sqlite3.Error as e:
             conn.rollback()
@@ -270,7 +270,7 @@ class Database:
                 INSERT INTO laboratoires (nom, faculte, responsable, email, telephone, adresse)
                 VALUES (?, ?, ?, ?, ?, ?)
             ''', default_labs)
-            print("✅ Default laboratories inserted")
+            print("Default laboratories inserted")
         
         # Insert default supervisors
         cursor.execute("SELECT COUNT(*) as count FROM encadrants")
@@ -287,13 +287,13 @@ class Database:
                 INSERT INTO encadrants (nom, prenom, grade, laboratoire_id, email, telephone, specialite)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ''', default_supervisors)
-            print("✅ Default supervisors inserted")
+            print("Default supervisors inserted")
     
     # ===== DOCTORANTS CRUD =====
     
     def add_doctorant(self, data: Dict[str, Any]) -> int:
         """Add a new PhD student and return the ID - FIXED VERSION"""
-        print(f"🔧 Adding doctorant: {data.get('nom')} {data.get('prenom')}")
+        print(f"Adding doctorant: {data.get('nom')} {data.get('prenom')}")
         
         # Use transaction context manager for safety
         with self.transaction() as cursor:
@@ -307,7 +307,7 @@ class Database:
                     """, (year,))
                     count = cursor.fetchone()[0] + 1
                     data['matricule'] = f"DOC{year}{str(count).zfill(3)}"
-                    print(f"📝 Generated matricule: {data['matricule']}")
+                    print(f"Generated matricule: {data['matricule']}")
                 
                 query = '''
                 INSERT INTO doctorants (
@@ -364,14 +364,14 @@ class Database:
                     'termine'
                 ))
                 
-                print(f"✅ Doctorant added successfully with ID: {doctorant_id}")
+                print(f"Doctorant added successfully with ID: {doctorant_id}")
                 return doctorant_id
                 
             except sqlite3.Error as e:
-                print(f"❌ SQL Error: {e}")
+                print(f"SQL Error: {e}")
                 raise Exception(f"Erreur lors de l'ajout du doctorant: {str(e)}")
             except Exception as e:
-                print(f"❌ General Error: {e}")
+                print(f"General Error: {e}")
                 raise Exception(f"Erreur générale: {str(e)}")
     
     def update_doctorant(self, doctorant_id: int, data: Dict[str, Any]) -> bool:
@@ -492,7 +492,6 @@ class Database:
     
     # ... (KEEP ALL OTHER METHODS AS THEY ARE, but update connection usage)
     # For other methods like search_doctorants, get_activities, etc.
-    # Just make sure they use self.get_connection() and close it properly
     
     # ===== ACTIVITIES CRUD =====
     
@@ -540,15 +539,15 @@ class Database:
             cursor = conn.cursor()
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
             tables = cursor.fetchall()
-            print(f"✅ Connection successful")
-            print(f"✅ Tables found: {[t[0] for t in tables]}")
+            print(f"Connection successful")
+            print(f"Tables found: {[t[0] for t in tables]}")
             conn.close()
         except Exception as e:
-            print(f"❌ Connection failed: {str(e)}")
+            print(f"Connection failed: {str(e)}")
             return False
         
         # 2. Test inserting a doctorant
-        print("\n🔧 Testing doctorant insertion...")
+        print("\nTesting doctorant insertion...")
         try:
             test_data = {
                 'nom': 'Test',
@@ -563,36 +562,36 @@ class Database:
             
             print(f"📝 Test data: {test_data}")
             doctorant_id = self.add_doctorant(test_data)
-            print(f"✅ Test doctorant added with ID: {doctorant_id}")
+            print(f"Test doctorant added with ID: {doctorant_id}")
             
             # 3. Verify insertion
             doctorant = self.get_doctorant(doctorant_id)
             if doctorant:
-                print(f"✅ Doctorant retrieved: {doctorant['nom']} {doctorant['prenom']}")
-                print(f"✅ Matricule: {doctorant.get('matricule', 'N/A')}")
+                print(f"Doctorant retrieved: {doctorant['nom']} {doctorant['prenom']}")
+                print(f"Matricule: {doctorant.get('matricule', 'N/A')}")
                 
                 # 4. Clean up test data
                 success = self.delete_doctorant(doctorant_id)
                 if success:
-                    print(f"✅ Test doctorant deleted")
+                    print(f"Test doctorant deleted")
                 else:
-                    print(f"⚠️ Could not delete test doctorant")
+                    print(f"Could not delete test doctorant")
             else:
-                print(f"❌ Failed to retrieve test doctorant")
+                print(f"Failed to retrieve test doctorant")
                 return False
                 
             print("\n" + "="*50)
-            print("✅ ALL TESTS PASSED!")
+            print("ALL TESTS PASSED!")
             print("="*50)
             return True
             
         except Exception as e:
-            print(f"❌ Test failed: {str(e)}")
+            print(f"Test failed: {str(e)}")
             import traceback
             traceback.print_exc()
             
             print("\n" + "="*50)
-            print("❌ TESTS FAILED")
+            print("TESTS FAILED")
             print("="*50)
             return False
     
@@ -600,13 +599,13 @@ class Database:
     
     def diagnose_connection(self):
         """Diagnose database connection issues"""
-        print("\n🔍 DATABASE DIAGNOSIS")
+        print("\nDATABASE DIAGNOSIS")
         print("-" * 40)
         
         # Check if file exists
         if not os.path.exists(self.db_path):
-            print(f"❌ Database file not found: {self.db_path}")
-            print("💡 Creating new database...")
+            print(f"Database file not found: {self.db_path}")
+            print("Creating new database...")
             self.init_database()
             return
         
@@ -615,15 +614,15 @@ class Database:
             import stat
             st = os.stat(self.db_path)
             size_kb = st.st_size / 1024
-            print(f"📁 Database file: {self.db_path}")
-            print(f"📊 Size: {size_kb:.2f} KB")
-            print(f"🔒 Permissions: {oct(st.st_mode)[-3:]}")
-            print(f"✏️  Writable: {os.access(self.db_path, os.W_OK)}")
+            print(f"Database file: {self.db_path}")
+            print(f"Size: {size_kb:.2f} KB")
+            print(f"Permissions: {oct(st.st_mode)[-3:]}")
+            print(f"Writable: {os.access(self.db_path, os.W_OK)}")
         except Exception as e:
-            print(f"❌ Cannot access file: {e}")
+            print(f"Cannot access file: {e}")
         
         # Try to connect
-        print("\n🔌 Testing connection...")
+        print("\nTesting connection...")
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
@@ -631,27 +630,27 @@ class Database:
             # Test simple query
             cursor.execute("SELECT 1 as test")
             result = cursor.fetchone()
-            print(f"✅ Basic query test: {result['test']}")
+            print(f"Basic query test: {result['test']}")
             
             # Count doctorants
             cursor.execute("SELECT COUNT(*) as count FROM doctorants")
             count = cursor.fetchone()['count']
-            print(f"👥 Total doctorants: {count}")
+            print(f"Total doctorants: {count}")
             
             # Count laboratories
             cursor.execute("SELECT COUNT(*) as count FROM laboratoires")
             count = cursor.fetchone()['count']
-            print(f"🏛️  Total laboratories: {count}")
+            print(f"Total laboratories: {count}")
             
             conn.close()
-            print("✅ Connection test successful")
+            print("Connection test successful")
             
         except sqlite3.Error as e:
-            print(f"❌ Connection error: {e}")
+            print(f"Connection error: {e}")
             
             # Try to repair
             if "locked" in str(e):
-                print("🔄 Attempting to repair locked database...")
+                print("Attempting to repair locked database...")
                 self.cleanup_lock_files()
                 time.sleep(1)
                 
@@ -660,9 +659,9 @@ class Database:
                     conn = sqlite3.connect(self.db_path, timeout=5.0)
                     conn.execute("PRAGMA wal_checkpoint(FULL)")
                     conn.close()
-                    print("✅ Database repaired")
+                    print("Database repaired")
                 except:
-                    print("❌ Could not repair database")
+                    print("Could not repair database")
     
     # ... (KEEP ALL OTHER METHODS THE SAME, just ensure they use proper connection handling)
     
